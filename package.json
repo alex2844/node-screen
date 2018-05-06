@@ -1,5 +1,5 @@
 {
-	"name": "screen",
+	"name": "node-screen",
 	"version": "0.0.1",
 	"description": "Take a screenshot of your desktop",
 	"main": "module.js",
