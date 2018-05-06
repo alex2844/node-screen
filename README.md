@@ -1,5 +1,7 @@
 # node-screen
 
+[![Version](https://img.shields.io/npm/v/node-screen.svg)](https://www.npmjs.org/package/node-screen)
+
 Take a screenshot of your desktop interactively.
 
 Available in Linux and Windows.
