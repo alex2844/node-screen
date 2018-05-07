@@ -10,8 +10,8 @@
 	}, {}),
 	bin: {
 		shot: function(argv) {
-			module.shot((argv.output || 'screenshot.jpg'), function(err, res) {
-				console.log(err || res);
+			module.shot((argv.output || 'screenshot.jpg'), function(err, res, stderr) {
+				console.log(stderr || res);
 			});
 		},
 	},

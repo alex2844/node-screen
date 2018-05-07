@@ -8,7 +8,7 @@ Available in Linux and Windows.
 
 ``` javascript
 var screen = require('node-screen');
-screen.shot('screen.png', function(err, res) {
+screen.shot('screen.png', function(err, res, stderr) {
 	console.log(err || res);
 });
 ```

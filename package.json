@@ -1,10 +1,13 @@
 {
 	"name": "node-screen",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Take a screenshot of your desktop",
 	"main": "module.js",
 	"bin": {
 		"node-screen": "bin.js"
+	},
+	"pkg": {
+		"assets": "bin/*"
 	},
 	"os": [
 		"win32", "linux"
