@@ -1,6 +1,6 @@
 {
 	"name": "node-screen",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Take a screenshot of your desktop",
 	"main": "module.js",
 	"bin": {
