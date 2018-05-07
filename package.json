@@ -3,6 +3,9 @@
 	"version": "0.0.1",
 	"description": "Take a screenshot of your desktop",
 	"main": "module.js",
+	"bin": {
+		"node-screen": "bin.js"
+	},
 	"os": [
 		"win32", "linux"
 	],

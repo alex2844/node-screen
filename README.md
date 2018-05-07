@@ -13,6 +13,10 @@ screen.shot('screen.png', function(err, res) {
 });
 ```
 
+``` bash
+node-screen shot --output screen.png
+```
+
 ## Installation
 ```
 npm install -g node-screen

@@ -33,10 +33,10 @@ module.exports = {
 	shot: function(filePath, callback) {
 		exec(module.exports.cmd.shot(filePath), function(err) {
 			if (err && os.platform() !== 'win32')
-				callback(err);
+				return callback(err.message, null, err);
 			fs.exists(filePath, function(exists) {
 				if (!exists)
-					return callback(new Error('Screenshot failed'));
+					return callback('Screenshot failed', null, new Error('Screenshot failed'));
 				callback(null, filePath);
 			});
 		});
