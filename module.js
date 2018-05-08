@@ -8,8 +8,7 @@ module.exports = {
 		shot: function() {
 			switch (os.platform()) {
 				case 'win32': {
-					// http://www.nirsoft.net/utils/nircmd.html
-					return process.env['TEMP']+'\\nircmdc.exe savescreenshot';
+					return process.env['TEMP']+'\\shot.exe';
 				}
 				case 'freebsd': {
 					return 'scrot -s';
@@ -28,7 +27,7 @@ module.exports = {
 		mousemove: function(x, y) {
 			switch (os.platform()) {
 				case 'win32': {
-					return process.env['TEMP']+'\\nircmdc.exe setcursor '+x+' '+y;
+					return process.env['TEMP']+'\\mouse.exe moveTo '+x+'x'+y;
 				}
 				case 'linux': {
 					return 'xte "mousemove '+x+' '+y+'"';
@@ -41,7 +40,7 @@ module.exports = {
 		mouseclick: function(key, code) {
 			switch (os.platform()) {
 				case 'win32': {
-					return process.env['TEMP']+'\\nircmdc.exe sendmouse '+key+' click';
+					return process.env['TEMP']+'\\mouse.exe '+((key == 'left') ? 'click' : 'rightClick');
 				}
 				case 'linux': {
 					return 'xte "mouseclick '+code+'"';
@@ -52,19 +51,17 @@ module.exports = {
 			}
 		}
 	},
-	init: function(callback) {
+	init: function(bin, callback) {
 		if (os.platform() !== 'win32')
 			callback();
 		else
-			fs.createReadStream(path.resolve(__dirname, 'bin/nircmdc.exe')).pipe(fs.createWriteStream(process.env['TEMP']+'\\nircmdc.exe').on('finish', callback));
+			fs.createReadStream(path.resolve(__dirname, 'bin/'+bin+'.exe')).pipe(fs.createWriteStream(process.env['TEMP']+'\\'+bin+'.exe').on('finish', callback));
 	},
 	shot: function(output, callback) {
-		module.exports.init(function() {
+		module.exports.init('shot', function() {
 			exec(module.exports.cmd.shot()+' '+output, function(err, res, stderr) {
 				if (err && os.platform() !== 'win32')
 					return callback(err.message, null, err);
-				else
-					fs.unlink(process.env['TEMP']+'\\nircmdc.exe', function() {});
 				fs.exists(output, function(exists) {
 					if (!exists)
 						return callback('Screenshot failed', null, new Error('Screenshot failed'));
@@ -74,14 +71,14 @@ module.exports = {
 		});
 	},
 	mousemove: function(coords, callback) {
-		module.exports.init(function() {
+		module.exports.init('mouse', function() {
 			exec(module.exports.cmd.mousemove(Math.round(coords.x), Math.round(coords.y)), callback);
 		});
 	},
 	mouseclick: function(key, callback) {
 		var code = ['left', 'middle', 'right'].indexOf(key) + 1;
 		if (code > 0)
-			module.exports.init(function() {
+			module.exports.init('mouse', function() {
 				exec(module.exports.cmd.mouseclick(key, code), callback);
 			});
 		else
