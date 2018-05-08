@@ -12,6 +12,15 @@ screen.shot('screen.png', function(err, res, stderr) {
 	console.log(err || res);
 });
 ```
+``` javascript
+var screen = require('node-screen');
+screen.mousemove({
+	x: 34,
+	y: 28
+}, function() {
+	screen.mouseclick('left');
+});
+```
 
 ``` bash
 node-screen shot --output screen.png
