@@ -61,7 +61,7 @@ module.exports = {
 		module.exports.init('shot', function() {
 			exec(module.exports.cmd.shot()+' '+output, function(err, res) {
 				if (typeof(callback) == 'function') {
-					if (err && (os.platform() !== 'win32')
+					if (err && (os.platform() !== 'win32'))
 						return callback(err.message, null, err);
 					fs.exists(output, function(exists) {
 						if (!exists)
