@@ -5,20 +5,46 @@ var exec = require('child_process').exec,
 
 module.exports = {
 	cmd: {
-		shot: function(path) {
+		shot: function() {
 			switch (os.platform()) {
 				case 'win32': {
 					// http://www.nirsoft.net/utils/nircmd.html
-					return process.env['TEMP']+'\\nircmdc.exe savescreenshot '+path;
+					return process.env['TEMP']+'\\nircmdc.exe savescreenshot';
 				}
 				case 'freebsd': {
-					return 'scrot -s '+path;
+					return 'scrot -s';
 				}
 				case 'darwin': {
-					return 'screencapture -i '+path;
+					return 'screencapture -i';
 				}
 				case 'linux': {
-					return 'import -window root '+path;
+					return 'import -window root';
+				}
+				default: {
+					throw new Error('unsupported platform');
+				}
+			}
+		},
+		mousemove: function(x, y) {
+			switch (os.platform()) {
+				case 'win32': {
+					return process.env['TEMP']+'\\nircmdc.exe setcursor '+x+' '+y;
+				}
+				case 'linux': {
+					return 'xte "mousemove '+x+' '+y+'"';
+				}
+				default: {
+					throw new Error('unsupported platform');
+				}
+			}
+		},
+		mouseclick: function(key, code) {
+			switch (os.platform()) {
+				case 'win32': {
+					return process.env['TEMP']+'\\nircmdc.exe sendmouse '+key+' click';
+				}
+				case 'linux': {
+					return 'xte "mouseclick '+code+'"';
 				}
 				default: {
 					throw new Error('unsupported platform');
@@ -26,35 +52,38 @@ module.exports = {
 			}
 		}
 	},
-	shot: function(path, callback) {
-		(function(cb) {
-			if (os.platform() !== 'win32')
-				cb();
-			else
-				fs.createReadStream(path.resolve(__dirname, 'bin/nircmdc.exe')).pipe(fs.createWriteStream(process.env['TEMP']+'\\nircmdc.exe').on('finish', cb));
-		})(function() {
-			exec(module.exports.cmd.shot(path), function(err, res, stderr) {
+	init: function(callback) {
+		if (os.platform() !== 'win32')
+			callback();
+		else
+			fs.createReadStream(path.resolve(__dirname, 'bin/nircmdc.exe')).pipe(fs.createWriteStream(process.env['TEMP']+'\\nircmdc.exe').on('finish', callback));
+	},
+	shot: function(output, callback) {
+		module.exports.init(function() {
+			exec(module.exports.cmd.shot()+' '+output, function(err, res, stderr) {
 				if (err && os.platform() !== 'win32')
 					return callback(err.message, null, err);
 				else
 					fs.unlink(process.env['TEMP']+'\\nircmdc.exe', function() {});
-				fs.exists(path, function(exists) {
+				fs.exists(output, function(exists) {
 					if (!exists)
 						return callback('Screenshot failed', null, new Error('Screenshot failed'));
-					callback(null, path);
+					callback(null, output);
 				});
 			});
 		});
 	},
 	mousemove: function(coords, callback) {
-		console.log(coords);
-		exec('xte "mousemove '+coords.x+' '+coords.y+'"', callback);
+		module.exports.init(function() {
+			exec(module.exports.cmd.mousemove(Math.round(coords.x), Math.round(coords.y)), callback);
+		});
 	},
 	mouseclick: function(key, callback) {
 		var code = ['left', 'middle', 'right'].indexOf(key) + 1;
-		console.log({key: key});
 		if (code > 0)
-			exec('xte "mouseclick '+code+'"', callback);
+			module.exports.init(function() {
+				exec(module.exports.cmd.mouseclick(key, code), callback);
+			});
 		else
 			return callback('Detect key failed', null, new Error('Detect key failed'));
 	}

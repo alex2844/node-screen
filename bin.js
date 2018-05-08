@@ -13,7 +13,7 @@
 			module.shot((argv.output || 'screenshot.jpg'), function(err, res, stderr) {
 				console.log(stderr || res);
 			});
-		},
+		}
 	},
 	help: function() {
 		console.log([
