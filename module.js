@@ -75,7 +75,7 @@ module.exports = {
 	mousemove: function(coords, callback) {
 		module.exports.init('mouse', function() {
 			exec(module.exports.cmd.mousemove(Math.round(coords.x), Math.round(coords.y)), function(err, res) {
-				if (typeof(callback) == 'function') {
+				if (typeof(callback) == 'function')
 					callback(err.message, res, err);
 			});
 		});
@@ -85,7 +85,7 @@ module.exports = {
 		if (code > 0)
 			module.exports.init('mouse', function() {
 				exec(module.exports.cmd.mouseclick(code), function(err, res) {
-					if (typeof(callback) == 'function') {
+					if (typeof(callback) == 'function')
 						callback(err.message, res, err);
 				});
 			});
