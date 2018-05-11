@@ -4,11 +4,12 @@ var exec = require('child_process').exec,
 	path = require('path');
 
 module.exports = {
+	pkg: [],
 	cmd: {
-		shot: function() {
+		shot: function(output, width) {
 			switch (os.platform()) {
 				case 'win32': {
-					return process.env['TEMP']+'\\shot.exe';
+					return process.env['TEMP']+'\\shot.exe '+output+(width ? ' '+width : '');
 				}
 				case 'freebsd': {
 					return 'scrot -s';
@@ -17,7 +18,7 @@ module.exports = {
 					return 'screencapture -i';
 				}
 				case 'linux': {
-					return 'import -window root';
+					return 'import -window root '+(width ? ' -resize '+width+' -quality '+parseInt(width/20) : '')+' '+output;
 				}
 				default: {
 					throw new Error('unsupported platform');
@@ -52,14 +53,20 @@ module.exports = {
 		}
 	},
 	init: function(bin, callback) {
-		if (os.platform() !== 'win32')
+		if ((module.exports.pkg.indexOf(bin) > -1) || (os.platform() !== 'win32'))
 			callback();
-		else
+		else{
+			module.exports.pkg.push(bin);
 			fs.createReadStream(path.resolve(__dirname, 'bin/'+bin+'.exe')).pipe(fs.createWriteStream(process.env['TEMP']+'\\'+bin+'.exe').on('finish', callback));
+		}
 	},
-	shot: function(output, callback) {
+	shot: function(output, width, callback) {
+		if (!callback && width) {
+			callback = width;
+			width = null;
+		}
 		module.exports.init('shot', function() {
-			exec(module.exports.cmd.shot()+' '+output, function(err, res) {
+			exec(module.exports.cmd.shot(output, width), function(err, res) {
 				if (typeof(callback) == 'function') {
 					if (err && (os.platform() !== 'win32'))
 						return callback(err.message, null, err);

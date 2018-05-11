@@ -14,6 +14,12 @@ screen.shot('screen.png', function(err, res, stderr) {
 ```
 ``` javascript
 var screen = require('node-screen');
+screen.shot('screen-800px.png', 800, function(err, res, stderr) {
+	console.log(err || res);
+});
+```
+``` javascript
+var screen = require('node-screen');
 screen.mousemove({
 	x: 34,
 	y: 28

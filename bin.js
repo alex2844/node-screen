@@ -10,7 +10,7 @@
 	}, {}),
 	bin: {
 		shot: function(argv) {
-			module.shot((argv.output || 'screenshot.jpg'), function(err, res, stderr) {
+			module.shot((argv.output || 'screenshot.jpg'), (argv.width || null), function(err, res, stderr) {
 				console.log(stderr || res);
 			});
 		}
@@ -18,7 +18,8 @@
 	help: function() {
 		console.log([
 			'schot - Create screenshot',
-			'  --output              (default: screenshot.jpg)'
+			'  --output              (default: screenshot.jpg)',
+			'  --width'
 		].join('\n'));
 	},
 	main: function() {
