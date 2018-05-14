@@ -1,19 +1,28 @@
-var exec = require('child_process').exec,
+var pkg = require('./package.json'),
+	exec = require('child_process').exec,
 	fs = require('fs'),
 	path = require('path');
 
-(module.exports = {
+module.exports = {
+	pkg: (function(i, o) {
+		var p = pkg.version.replace(/\./g, ''),
+			e = ((process.platform == 'win32') ? '.exe' : '');
+		if (i[process.platform])
+			i[process.platform].map(function(b) {
+				if (!process.pkg)
+					o[b] = path.resolve(__dirname, 'bin/'+b+e);
+				else if (!fs.existsSync((o[b] = path.resolve(process.env['TEMP'], b+'_'+p+e))))
+					fs.writeFileSync(o[b], fs.readFileSync(path.resolve(__dirname, 'bin/'+b+e)));
+			});
+		return o;
+	})({
+		'win32': ['shot', 'mouse']
+	}, []),
 	cmd: {
 		shot: function(output, width) {
 			switch (process.platform) {
 				case 'win32': {
-					return process.env['TEMP']+'\\shot.exe '+output+(width ? ' '+width : '');
-				}
-				case 'freebsd': {
-					return 'scrot -s';
-				}
-				case 'darwin': {
-					return 'screencapture -i';
+					return module.exports.pkg.shot+' '+output+(width ? ' '+width : '');
 				}
 				case 'linux': {
 					return 'import -window root '+(width ? ' -resize '+width+' -quality '+parseInt(width/20) : '')+' '+output;
@@ -26,7 +35,7 @@ var exec = require('child_process').exec,
 		mousemove: function(x, y) {
 			switch (process.platform) {
 				case 'win32': {
-					return process.env['TEMP']+'\\mouse.exe mousemove '+x+' '+y;
+					return module.exports.pkg.mouse+' mousemove '+x+' '+y;
 				}
 				case 'linux': {
 					return 'xte "mousemove '+x+' '+y+'"';
@@ -39,7 +48,7 @@ var exec = require('child_process').exec,
 		mouseclick: function(code) {
 			switch (process.platform) {
 				case 'win32': {
-					return process.env['TEMP']+'\\mouse.exe mouseclick '+code;
+					return module.exports.pkg.mouse+' mouseclick '+code;
 				}
 				case 'linux': {
 					return 'xte "mouseclick '+code+'"';
@@ -57,7 +66,7 @@ var exec = require('child_process').exec,
 		}
 		exec(module.exports.cmd.shot(output, width), function(err, res) {
 			if (typeof(callback) == 'function') {
-				if (err && (process.platform != 'win32'))
+				if (err)
 					return callback(err.message, null, err);
 				fs.exists(output, function(exists) {
 					if (!exists)
@@ -82,14 +91,5 @@ var exec = require('child_process').exec,
 			});
 		else
 			return callback('Detect key failed', null, new Error('Detect key failed'));
-	},
-	main: function() {
-		console.log('Node-screen main');
-		if (process.platform == 'win32')
-			['shot', 'mouse'].map(function(bin) {
-				fs.createReadStream(path.resolve(__dirname, 'bin/'+bin+'.exe')).pipe(fs.createWriteStream(process.env['TEMP']+'\\'+bin+'.exe').on('finish', function() {
-					console.log('extract bin: '+bin);
-				}));
-			});
 	}
-}).main();
+}
